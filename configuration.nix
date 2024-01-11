@@ -52,21 +52,17 @@
 
   # Enable the KDE Plasma Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
-  services.xserver.displayManager.autoLogin = {
-    enable = true;
-    user = "kubik";
-  };
+  #services.xserver.displayManager.autoLogin = {
+  #  enable = true;
+  #  user = "kubik";
+  #};
   services.xserver.desktopManager.plasma5.enable = true;
   
   # enable also gnome
-#  services.xserver.desktopManager.gnome.enable = true;
+  services.xserver.desktopManager.gnome.enable = true;
  
   # hotfix
   programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.libsForQt5.ksshaskpass.out}/bin/ksshaskpass";
-
-
-  # Set auto lock to 1 hour
-  services.xserver.xautolock.time = 60;
  
   # Configure keymap in X11
   services.xserver = {
@@ -97,14 +93,6 @@
     #media-session.enable = true;
   };
 
-  # The AMDVLK drivers can be used in addition to the Mesa RADV drivers
-  hardware.opengl.extraPackages = with pkgs; [
-    amdvlk
-  ];
-  # For 32 bit applications 
-  hardware.opengl.extraPackages32 = with pkgs; [
-    driversi686Linux.amdvlk
-  ]; 
   # Power management + fans
   hardware.system76.enableAll = true;
 
@@ -129,25 +117,35 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    pkgs.signal-desktop
+    # work
     pkgs.android-studio	
     pkgs.android-tools
     pkgs.git
+    pkgs.slack
+    # personal
+    pkgs.signal-desktop    
     pkgs.thunderbird	
     pkgs.steam
     pkgs.pciutils
     pkgs.bitwarden
-    pkgs.libsForQt5.ktorrent    
     pkgs.geany
+    # torrent
+    pkgs.libsForQt5.ktorrent    
     pkgs.jackett
     pkgs.sonarr
-    #pkgs.dropbox  #dropbox login is broken
+    #dropbox login is broken    
+    pkgs.dropbox
     pkgs.lm_sensors
     pkgs.gnumake
     pkgs.openssh
     pkgs.smplayer
     pkgs.mpv
     pkgs.lshw
+    pkgs.libreoffice
+    pkgs.gimp
+
+    #gnome specific?
+    pkgs.gnome.gnome-screenshot
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
   ];
