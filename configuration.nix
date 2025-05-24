@@ -8,7 +8,17 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
+      ./bash.nix
+      ./case/torrent.nix
+      ./case/ssh.nix
+      #./case/iscsi.nix
+      #./case/dropbox.nix	
+      #./case/postgres.nix
+      #./case/nextcloud.nix	
+      #./case/listmonk.nix
+      #./case/testing.nix		
     ];
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -46,28 +56,22 @@
   };
 
   # Enable the X11 windowing system.
+  # You can disable this if you're only using the Wayland session.
   services.xserver.enable = true;
   # Set correct video driver
   services.xserver.videoDrivers = [ "amdgpu" ];
 
   # Enable the KDE Plasma Desktop Environment.
-  services.xserver.displayManager.sddm.enable = true;
-  #services.xserver.displayManager.autoLogin = {
-  #  enable = true;
-  #  user = "kubik";
-  #};
-  services.xserver.desktopManager.plasma5.enable = true;
-  
-  # enable also gnome
+  services.displayManager.sddm.enable = true;
+  services.desktopManager.plasma6.enable = true;
+
+   # enable also gnome
   services.xserver.desktopManager.gnome.enable = true;
- 
-  # hotfix
-  programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.libsForQt5.ksshaskpass.out}/bin/ksshaskpass";
- 
+
   # Configure keymap in X11
-  services.xserver = {
+  services.xserver.xkb = {
     layout = "cz";
-    xkbVariant = "";
+    variant = "";
   };
 
   # Configure console keymap
@@ -77,7 +81,6 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  sound.enable = true;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -93,23 +96,26 @@
     #media-session.enable = true;
   };
 
-  # Power management + fans
-  hardware.system76.enableAll = true;
-
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.kubik = {
     isNormalUser = true;
-    description = "Kubik";
-    extraGroups = [ "networkmanager" "wheel" "adbusers" ];
+    description = "kubik";
+    extraGroups = [ "networkmanager" "wheel" "adbusers" "docker" "sonarr" ];
     packages = with pkgs; [
-      firefox
-      kate
+      kdePackages.kate
     #  thunderbird
     ];
   };
+
+  # Enable automatic login for the user.
+  #services.xserver.displayManager.autoLogin.enable = true;
+  #services.xserver.displayManager.autoLogin.user = "kubik";
+
+  # Install firefox.
+  programs.firefox.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
@@ -122,30 +128,56 @@
     pkgs.android-tools
     pkgs.git
     pkgs.slack
+    pkgs.go
+    pkgs.unzip
+    pkgs.mitmproxy
     # personal
+    pkgs.libsForQt5.dolphin
     pkgs.signal-desktop    
     pkgs.thunderbird	
     pkgs.steam
     pkgs.pciutils
     pkgs.bitwarden
     pkgs.geany
-    # torrent
-    pkgs.libsForQt5.ktorrent    
-    pkgs.jackett
-    pkgs.sonarr
-    #dropbox login is broken    
+    pkgs.nmap   
     pkgs.dropbox
     pkgs.lm_sensors
     pkgs.gnumake
-    pkgs.openssh
+    pkgs.htop
+    pkgs.jq
+    # union
+    pkgs.vscode
+    pkgs.jetbrains.idea-community
+    pkgs.dbeaver-bin
+    pkgs.docker
+    pkgs.docker-compose
+    pkgs.nodejs
+    pkgs.python3Full
+    pkgs.gnat
+    pkgs._7zz
+    pkgs.nix-prefetch
+    pkgs.discord
+    # ssh and keys
+    #pkgs.openssh
+    pkgs.gnupg
+    pkgs.openssl
+    # video
     pkgs.smplayer
     pkgs.mpv
+
+    pkgs.webkitgtk
     pkgs.lshw
     pkgs.libreoffice
     pkgs.gimp
-
+    pkgs.calibre
+    pkgs.vim
+    # NAS
+    pkgs.openiscsi
     #gnome specific?
     pkgs.gnome.gnome-screenshot
+    # gaming
+    pkgs.lutris
+    pkgs.wineWow64Packages.full
   #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
   #  wget
   ];
@@ -154,27 +186,31 @@
   programs.adb.enable = true;
   # steam needs extra care
   programs.steam.enable = true;
-  # SSH agent needs to be started?
-  programs.ssh.startAgent = true; 
+  
+  # hotfix for SSH key popup dialog
+  #programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.libsForQt5.ksshaskpass.out}/bin/ksshaskpass";
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  # GnuPG
+  #programs.gnupg.agent = {
+  #  enable = true;
+  #  enableSSHSupport = true;
+  #  pinentryPackage = pkgs.pinentry-qt;
+  #};
+  services.pcscd.enable = true;
+  # we need to turn off ssh-agent if we want to use gnupg agent with SSH support
+ # programs.ssh.startAgent = false;
 
-  # List services that you want to enable:
+  virtualisation.docker.enable = true;
 
   # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
+  #services.openssh.enable = true;
 
   # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 6881 51413 ];
+    allowedUDPPorts = [ 8881 ];
+  };
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
@@ -182,10 +218,20 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.05"; # Did you read the comment?
+  system.stateVersion = "24.05"; # Did you read the comment?
 
   system.autoUpgrade = {
       enable = true;
   };
 
+  nix.gc = {
+    automatic = true;
+    randomizedDelaySec = "14m";
+    options = "--delete-older-than 10d";
+  };
+
+#  environment.shellInit = ''
+#    gpg-connect-agent /bye
+#    export SSH_AUTH_SOCK=$(gpgconf --list-dirs agent-ssh-socket)
+#  '';
 }

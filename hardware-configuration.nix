@@ -8,20 +8,22 @@
     [ (modulesPath + "/installer/scan/not-detected.nix")
     ];
 
-  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "ahci" "usbhid" ];
+  boot.initrd.availableKernelModules = [ "nvme" "xhci_pci" "ahci" "usbhid" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ "amdgpu" ];
   boot.kernelModules = [ "kvm-amd" ];
+  boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "/dev/disk/by-uuid/6d8b7dc3-8a16-4fca-a9f4-35554ad8f98c";
+    { device = "/dev/disk/by-uuid/5e3bcf05-e917-464d-bf02-3786ba8d2ec0";
       fsType = "ext4";
     };
 
-  boot.initrd.luks.devices."luks-2516f782-f19b-452b-a620-e73c6581946a".device = "/dev/disk/by-uuid/2516f782-f19b-452b-a620-e73c6581946a";
+  boot.initrd.luks.devices."luks-0ba6d855-9044-44a9-be42-0e27b90be262".device = "/dev/disk/by-uuid/0ba6d855-9044-44a9-be42-0e27b90be262";
 
   fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/B18D-6B5A";
+    { device = "/dev/disk/by-uuid/A0EA-7075";
       fsType = "vfat";
+      options = [ "fmask=0077" "dmask=0077" ];
     };
 
   fileSystems."/media/data2" =
@@ -37,6 +39,12 @@
     };
 
   boot.initrd.luks.devices."data1".device = "/dev/disk/by-uuid/ef8de680-0070-4fab-8e96-4aa98868f8cf";
+
+  #fileSystems."/media/data3" = {
+  #  device = "/dev/disk/by-path/ip-192.168.0.11:3260-iscsi-iqn.2004-04.com.qnap:ts-464:iscsi.storage.82de6a";  # Replace with the correct device path after iSCSI login you cloud also do /dev/disk/by-uuid/<UUID-of-device>
+  #  fsType = "ext4";  # Or the correct filesystem type
+  #  options = [ "_netdev" "nofail" ];  # Ensures network is up before mounting and wont fail to boot if it cant connect
+  #};
 
   swapDevices = [ ];
 
