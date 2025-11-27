@@ -3,7 +3,7 @@
   # DO NOT FORGET TO ADD KEY BY ssh-add on new system
 
   # hotfix for SSH key popup dialog
-  programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.libsForQt5.ksshaskpass.out}/bin/ksshaskpass";
+  programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.kdePackages.ksshaskpass.out}/bin/ksshaskpass";
 
   # GnuPG
   programs.gnupg.agent = {

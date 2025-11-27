@@ -1,3 +1,4 @@
+
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
@@ -66,7 +67,7 @@
   services.desktopManager.plasma6.enable = true;
 
    # enable also gnome
-  services.xserver.desktopManager.gnome.enable = true;
+  services.desktopManager.gnome.enable = true;
 
   # Configure keymap in X11
   services.xserver.xkb = {
@@ -81,7 +82,7 @@
   services.printing.enable = true;
 
   # Enable sound with pipewire.
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -131,13 +132,15 @@
     pkgs.go
     pkgs.unzip
     pkgs.mitmproxy
+    pkgs.mediainfo
     # personal
-    pkgs.libsForQt5.dolphin
+    #pkgs.libsForQt5.dolphin
+    pkgs.kdePackages.dolphin
     pkgs.signal-desktop    
     pkgs.thunderbird	
     pkgs.steam
     pkgs.pciutils
-    pkgs.bitwarden
+    pkgs.bitwarden-desktop
     pkgs.geany
     pkgs.nmap   
     pkgs.dropbox
@@ -152,11 +155,11 @@
     pkgs.docker
     pkgs.docker-compose
     pkgs.nodejs
-    pkgs.python3Full
     pkgs.gnat
     pkgs._7zz
     pkgs.nix-prefetch
     pkgs.discord
+    pkgs.scribus
     # ssh and keys
     #pkgs.openssh
     pkgs.gnupg
@@ -165,7 +168,7 @@
     pkgs.smplayer
     pkgs.mpv
 
-    pkgs.webkitgtk
+    pkgs.webkitgtk_6_0
     pkgs.lshw
     pkgs.libreoffice
     pkgs.gimp
@@ -174,7 +177,7 @@
     # NAS
     pkgs.openiscsi
     #gnome specific?
-    pkgs.gnome.gnome-screenshot
+    pkgs.gnome-screenshot
     # gaming
     pkgs.lutris
     pkgs.wineWow64Packages.full
@@ -182,13 +185,15 @@
   #  wget
   ];
 
+  # Extra fonts, needed by Scribus
+  fonts.packages = with pkgs; [
+    merriweather-sans
+  ];
+
   # abd needs extra care
   programs.adb.enable = true;
   # steam needs extra care
   programs.steam.enable = true;
-  
-  # hotfix for SSH key popup dialog
-  #programs.ssh.askPassword = pkgs.lib.mkForce "${pkgs.libsForQt5.ksshaskpass.out}/bin/ksshaskpass";
 
   # GnuPG
   #programs.gnupg.agent = {

@@ -2,15 +2,18 @@
 {
   # torrent
   environment.systemPackages = [
-    pkgs.libsForQt5.ktorrent    
+    pkgs.kdePackages.ktorrent
+    #pkgs.libsForQt5.ktorrent    
     pkgs.transmission_4-qt
     pkgs.jackett
     pkgs.radarr 
     pkgs.sonarr
+    pkgs.flaresolverr
   ];
   
   services.transmission = { 
     enable = true; #Enable transmission daemon
+    package = pkgs.transmission_4;
     user = "sonarr";
     group = "sonarr";
     openRPCPort = true; #Open firewall for RPC
@@ -41,6 +44,11 @@
   services.jackett = {
     enable = true;
     openFirewall = true;
+  };
+
+  services.flaresolverr = {
+    enable = false;
+    openFirewall = true;  
   };
 
   # hot fix for depraceted dotnet SDK in nixos-24.11
